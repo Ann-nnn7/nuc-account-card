@@ -309,7 +309,18 @@ footer .sig{font-family:Georgia,serif;font-style:italic;font-size:15px;color:var
         <div class="addon-sub">账号全局</div>
         <div class="toggle-row">
           <span class="toggle" data-gbg="免费活动背景"><span class="dot"></span>免费活动背景</span>
-          <span class="toggle" data-gbg="小屋"><span class="dot"></span>小屋</span>
+        </div>
+        <div id="freeActPanel" style="display:none;margin-top:8px;padding:8px 10px;background:rgba(255,255,255,.55);border-radius:8px">
+          <div class="addon-sub" style="margin:0 0 6px">免费活动背景 · 具体内容（可多选，可备注角色）</div>
+          <div class="toggle-row" id="freeActRow">
+            <span class="toggle" data-fa="女仆签名画像"><span class="dot"></span>女仆签名画像</span>
+            <span class="toggle" data-fa="三周年背景"><span class="dot"></span>三周年背景</span>
+            <span class="toggle" data-fa="四周年背景"><span class="dot"></span>四周年背景</span>
+            <span class="toggle" data-fa="华伶珍藏画像"><span class="dot"></span>华伶珍藏画像</span>
+            <span class="toggle" data-fa="联动虚拟画像"><span class="dot"></span>联动虚拟画像</span>
+            <span class="toggle" data-fa="联动双人画像"><span class="dot"></span>联动双人画像</span>
+          </div>
+          <div class="free-note"><input type="text" id="freeActNote" placeholder="具体角色备注（选填）"></div>
         </div>
         <div class="addon-sub">生日氪金背景 · 按年份/角色</div>
         <div class="act-row" id="gbgYrRow"></div>
@@ -403,7 +414,7 @@ const RES = [
   ["r_lanzuan","蓝钻"],["r_fenzuan","粉钻"],["r_caisui","彩碎"],["r_juanzhou","卷轴"],
   ["r_epoint","e点"],["r_bigmonth","大月卡天数"],["r_smallmonth","小月卡天数"]
 ];
-const GLOBAL_ADDONS = ["免费活动背景","小屋"];
+const GLOBAL_ADDONS = ["免费活动背景"];
 const GBG_YEARS=[2025,2026];
 let gbgSelYr=2025;
 
@@ -416,7 +427,7 @@ let state = {
 RES.forEach(r=>state.resources[r[0]]="");
 function newAddons(){
   const gbl={}; GLOBAL_ADDONS.forEach(k=>gbl[k]=false);
-  return {global:gbl, globalNote:"", gbg:{}, activities:{"野性欲望":{}}, curAct:"野性欲望"};
+  return {global:gbl, globalNote:"", gbg:{}, freeAct:{items:{},note:""}, activities:{"野性欲望":{}}, curAct:"野性欲望"};
 }
 function migrateAddons(a){
   const n=newAddons();
@@ -424,6 +435,7 @@ function migrateAddons(a){
     if(a.global && typeof a.global==="object"){ GLOBAL_ADDONS.forEach(k=>{ if(a.global[k]) n.global[k]=true; }); }
     if(a.globalNote) n.globalNote=a.globalNote;
     if(a.gbg && typeof a.gbg==="object") n.gbg=a.gbg;
+    if(a.freeAct && typeof a.freeAct==="object") n.freeAct=a.freeAct;
     if(a.activities && typeof a.activities==="object"){
       n.activities=a.activities; n.curAct=a.curAct||"野性欲望";
     } else if(a.per && typeof a.per==="object"){
@@ -659,8 +671,32 @@ function bindResources(){
   document.querySelectorAll(".toggle[data-gbg]").forEach(t=>{
     const k=t.dataset.gbg;
     t.classList.toggle("on", !!state.addons.global[k]);
-    t.addEventListener("click", ()=>{ state.addons.global[k]=!state.addons.global[k]; t.classList.toggle("on",state.addons.global[k]); save(); });
+    t.addEventListener("click", ()=>{ state.addons.global[k]=!state.addons.global[k]; t.classList.toggle("on",state.addons.global[k]); refreshFreeAct(); save(); });
   });
+  const faPanel=document.getElementById("freeActPanel");
+  function refreshFreeAct(){
+    if(!faPanel) return;
+    faPanel.style.display = state.addons.global["免费活动背景"] ? "block":"none";
+    const items=(state.addons.freeAct&&state.addons.freeAct.items)||{};
+    document.querySelectorAll("#freeActRow .toggle[data-fa]").forEach(t=>{
+      t.classList.toggle("on", !!items[t.dataset.fa]);
+    });
+    const nin=document.getElementById("freeActNote");
+    if(nin) nin.value=(state.addons.freeAct&&state.addons.freeAct.note)||"";
+  }
+  document.querySelectorAll("#freeActRow .toggle[data-fa]").forEach(t=>{
+    t.addEventListener("click", ()=>{
+      const fa=state.addons.freeAct=state.addons.freeAct||{items:{},note:""};
+      fa.items=fa.items||{};
+      fa.items[t.dataset.fa]=!fa.items[t.dataset.fa];
+      refreshFreeAct(); save();
+    });
+  });
+  document.getElementById("freeActNote").addEventListener("input", e=>{
+    state.addons.freeAct=state.addons.freeAct||{items:{},note:""};
+    state.addons.freeAct.note=e.target.value; save();
+  });
+  refreshFreeAct();
   document.getElementById("addonGlobalNote").value = state.addons.globalNote||"";
   document.getElementById("addonGlobalNote").addEventListener("input", e=>{ state.addons.globalNote=e.target.value; save(); });
   bindAddonInputs();
@@ -770,6 +806,12 @@ function fillExport(){
   const gbl = state.addons.global||{};
   const gOwn = GLOBAL_ADDONS.filter(k=>gbl[k]);
   if(gOwn.length) a += `<div class="ex-item"><b>账号装饰</b><em>${gOwn.join("、")}</em></div>`;
+  if(state.addons.global["免费活动背景"]){
+    const fa=state.addons.freeAct||{items:{},note:""};
+    const faItems=Object.keys(fa.items||{}).filter(k=>fa.items[k]);
+    const faNote=fa.note||"";
+    if(faItems.length||faNote) a += `<div class="ex-item"><b>免费活动背景</b><em>${faItems.join("、")}${faItems.length&&faNote?" · ":""}${faNote}</em></div>`;
+  }
   GBG_YEARS.forEach(y=>{
     const yd=(state.addons.gbg||{})[y]||{};
     const names=GROUPS.filter(g=>yd[g.name]).map(g=>g.name);
