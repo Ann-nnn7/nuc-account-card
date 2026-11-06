@@ -1128,12 +1128,11 @@ let selectedExportBg = null;
       row.querySelectorAll('.bg-opt').forEach(x=>x.classList.remove('on'));
       im.classList.add('on');
       selectedExportBg = b.src;
-      setTimeout(()=>preloadBg(b),0);
+      if(typeof preloadBg==="function"){ try{ preloadBg(b); }catch(e){} }
     });
     row.appendChild(im);
   });
   selectedExportBg = EXPORT_BGS[0] ? EXPORT_BGS[0].src : null;
-  if(EXPORT_BGS[0]) setTimeout(()=>preloadBg(EXPORT_BGS[0]),0);
 })();
 </script>
 
@@ -1715,6 +1714,8 @@ function preloadBg(b){
     }
   }
 }
+/* 初始背景预载：放在本脚本内，确保 preloadBg 已定义后再调用，避免跨脚本时序竞态 */
+try{ if(EXPORT_BGS[0]) preloadBg(EXPORT_BGS[0]); }catch(e){}
 function ensureHtml2Canvas(){
   return new Promise((resolve, reject) => {
     if(typeof window.html2canvas === "function") return resolve();
