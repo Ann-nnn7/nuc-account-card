@@ -77,7 +77,9 @@ section.block{margin-top:38px}
 .cg-head h3{font-size:16.5px;font-weight:800}
 .cg-head .cnt{font-size:12px;color:var(--blue-deep);background:var(--sky);border-radius:999px;padding:3px 10px}
 .cg-head .prog{font-size:12px;color:var(--sub);margin-left:auto}
-.cg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.cg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:359px){.cg-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:600px){.cg-grid{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:840px){.cg-grid{grid-template-columns:repeat(6,1fr)}}
 .card-cell{display:flex;flex-direction:column;gap:4px;cursor:pointer;border-radius:10px;padding:6px;min-width:0;
   border:2px solid var(--sky);background:#fff;transition:transform .12s,border-color .12s,filter .12s}
@@ -108,7 +110,6 @@ section.block{margin-top:38px}
 .fchip.active img{box-shadow:0 0 0 2px var(--blue)}
 
 /* collab group placeholder */
-.collab .cg-grid{grid-template-columns:repeat(6,1fr)}
 .collab-slot{display:flex;flex-direction:column;gap:4px;padding:6px;border:2px solid var(--sky);background:#fff;border-radius:10px;min-width:0}
 .collab-slot input{font-size:11px;font-weight:600;color:var(--ink);text-align:center;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none;min-width:0;max-width:100%;padding:1px 2px;border:none;background:transparent;width:100%}
 .collab-slot .own-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub);flex-wrap:wrap}
@@ -135,6 +136,13 @@ section.block{margin-top:38px}
 .email.sel{border-color:var(--blue-deep);background:var(--blue-deep);color:#fff;box-shadow:0 4px 12px rgba(47,111,181,.3)}
 input[type=text]{font-size:14px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fbfdff;width:100%;max-width:420px}
 
+/* 制图人填空（页头） */
+.maker-field{display:flex;align-items:center;gap:10px;justify-content:flex-start;margin:16px auto 0;flex-wrap:wrap}
+.maker-field label{font-size:13px;font-weight:700;color:var(--blue-deep);letter-spacing:.06em}
+.maker-field input{width:auto;min-width:200px;max-width:260px;margin:0}
+.maker-field input:focus{outline:none;border-color:var(--blue);background:#fff}
+#export .ex-maker{text-align:center;font-size:15px;font-weight:700;color:var(--blue-deep);letter-spacing:.05em;margin-bottom:10px}
+
 /* 加分项（全局 + 按角色） */
 .addon-sec{margin-bottom:18px}
 .addon-sec:last-child{margin-bottom:0}
@@ -153,6 +161,11 @@ input[type=text]{font-size:14px;padding:9px 12px;border:1px solid var(--line);bo
 .act-chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .act-add{border:1px dashed var(--line);background:transparent;color:var(--sub);border-radius:999px;padding:5px 12px;font-size:12px;cursor:pointer}
 .act-add:hover{border-color:var(--blue);color:var(--blue)}
+/* 账号属性：直接填空（替代原“其他”芯片） */
+input.attr-free-input{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;
+  padding:5px 14px;font-size:13px;min-width:150px;flex:1 1 150px;max-width:260px;width:auto;margin:0}
+input.attr-free-input::placeholder{color:var(--sub)}
+input.attr-free-input:focus{outline:none;border-color:var(--blue);background:#fff}
 
 /* 长图预览弹窗 */
 .modal{position:fixed;inset:0;background:rgba(16,30,50,.55);display:none;align-items:center;justify-content:center;z-index:99;padding:20px}
@@ -933,6 +946,21 @@ footer .foot-slogan, #export .ex-foot .foot-slogan{font-family:"TiHuShuTiA","Not
 
 /* ===== pixel font for export long-image title (.ex-title) only ===== */
 #export .ex-title{font-family:"SqrPond16","Cormorant Garamond","Noto Serif SC",serif !important;}
+
+/* ===== 点击星光迸发特效 ===== */
+.sparkle-layer{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:99999}
+.sparkle-burst{position:absolute;left:0;top:0;width:15px;height:15px;margin:0;
+  transform:translate(-50%,-50%);animation:sparkle-fly .62s ease-out forwards}
+.sparkle-burst svg{width:100%;height:100%;display:block}
+@keyframes sparkle-fly{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(0deg)}
+  18%{opacity:1}
+  100%{opacity:0;
+    transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.05) rotate(var(--rot))}
+}
+@media(prefers-reduced-motion:reduce){
+  .sparkle-burst{animation:none;opacity:0}
+}
 </style>
 </head>
 <body>
@@ -942,6 +970,10 @@ footer .foot-slogan, #export .ex-foot .foot-slogan{font-family:"TiHuShuTiA","Not
     <span class="kicker"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.6H22l-6.2 4.6L18.2 22 12 17.3 5.8 22l2.4-7.8L2 9.6h7.6z"/></svg> NU:Carnival · 账号卡面图鉴</span>
     <h1>我的游戏账号 <span class="sep">·</span> 新世界狂欢</h1>
     <p class="sub">手动录入卡面、资源与加分项，最后一键生成一张完整的长图，更清晰展示情号~</p>
+    <div class="maker-field">
+      <label for="makerInput">制图人</label>
+      <input type="text" id="makerInput" placeholder="请填上你的名字">
+    </div>
     <div class="chips">
       <div class="chip"><b id="cTotal">127</b><span>可录入限定卡</span></div>
       <div class="chip"><b id="cOwned">0</b><span>已拥有</span></div>
@@ -1060,7 +1092,6 @@ footer .foot-slogan, #export .ex-foot .foot-slogan{font-family:"TiHuShuTiA","Not
     <div class="s-head"><span class="no">05</span><h2>账号属性</h2><span class="hint">标记账号的集齐属性（可多选）</span></div>
     <div class="panel">
       <div class="act-row" id="attrRow"></div>
-      <div class="free-note" id="attrNoteWrap" style="display:none"><input type="text" id="attrNote" placeholder="多推齐 / 请填这里"></div>
     </div>
   </section>
 
@@ -1082,7 +1113,7 @@ footer .foot-slogan, #export .ex-foot .foot-slogan{font-family:"TiHuShuTiA","Not
 
 
 <script>
-const EXPORT_BGS = [{"id": "bg1", "name": "背景1", "src": "assets/export-bgs/bg1.jpg"}, {"id": "bg2", "name": "背景2", "src": "assets/export-bgs/bg2.jpg"}, {"id": "bg3", "name": "背景3", "src": "assets/export-bgs/bg3.jpg"}, {"id": "bg4", "name": "背景4", "src": "assets/export-bgs/bg4.jpg"}, {"id": "bg5", "name": "背景5", "src": "assets/export-bgs/bg5.jpg"}, {"id": "bg6", "name": "背景6", "src": "assets/export-bgs/bg6.jpg"}, {"id": "bg7", "name": "背景7", "src": "assets/export-bgs/bg7.jpg"}, {"id": "bg8", "name": "背景8", "src": "assets/export-bgs/bg8.jpg"}, {"id": "bg9", "name": "背景9", "src": "assets/export-bgs/bg9.jpg"}, {"id": "bg10", "name": "背景10", "src": "assets/export-bgs/bg10.jpg"}, {"id": "bg11", "name": "背景11", "src": "assets/export-bgs/bg11.jpg"}, {"id": "bg12", "name": "背景12", "src": "assets/export-bgs/bg12.jpg"}, {"id": "bg13", "name": "背景13", "src": "assets/export-bgs/bg13.jpg"}, {"id": "bg14", "name": "背景14", "src": "assets/export-bgs/bg14.jpg"}, {"id": "bg15", "name": "背景15", "src": "assets/export-bgs/bg15.jpg"}, {"id": "bg16", "name": "背景16", "src": "assets/export-bgs/bg16.jpg"}, {"id": "bg17", "name": "背景17", "src": "assets/export-bgs/bg17.jpg"}, {"id": "bg18", "name": "背景18", "src": "assets/export-bgs/bg18.jpg"}, {"id": "bg19", "name": "背景19", "src": "assets/export-bgs/bg19.jpg"}, {"id": "bg20", "name": "背景20", "src": "assets/export-bgs/bg20.jpg"}, {"id": "bg21", "name": "背景21", "src": "assets/export-bgs/bg21.jpg"}, {"id": "bg22", "name": "背景22", "src": "assets/export-bgs/bg22.jpg"}, {"id": "bg23", "name": "背景23", "src": "assets/export-bgs/bg23.jpg"}, {"id": "bg24", "name": "背景24", "src": "assets/export-bgs/bg24.jpg"}, {"id": "bg25", "name": "背景25", "src": "assets/export-bgs/bg25.jpg"}, {"id": "bg26", "name": "背景26", "src": "assets/export-bgs/bg26.jpg"}, {"id": "bg27", "name": "背景27", "src": "assets/export-bgs/bg27.jpg"}, {"id": "bg28", "name": "背景28", "src": "assets/export-bgs/bg28.jpg"}, {"id": "bg29", "name": "背景29", "src": "assets/export-bgs/bg29.jpg"}, {"id": "bg30", "name": "背景30", "src": "assets/export-bgs/bg30.jpg"}, {"id": "bg31", "name": "背景31", "src": "assets/export-bgs/bg31.jpg"}, {"id": "bg32", "name": "背景32", "src": "assets/export-bgs/bg32.jpg"}, {"id": "bg33", "name": "背景33", "src": "assets/export-bgs/bg33.jpg"}, {"id": "bg34", "name": "背景34", "src": "assets/export-bgs/bg34.jpg"}, {"id": "bg35", "name": "背景35", "src": "assets/export-bgs/bg35.jpg"}, {"id": "bg36", "name": "背景36", "src": "assets/export-bgs/bg36.jpg"}, {"id": "bg37", "name": "背景37", "src": "assets/export-bgs/bg37.jpg"}, {"id": "bg38", "name": "背景38", "src": "assets/export-bgs/bg38.jpg"}, {"id": "bg39", "name": "背景39", "src": "assets/export-bgs/bg39.jpg"}, {"id": "bg40", "name": "背景40", "src": "assets/export-bgs/bg40.jpg"}, {"id": "bg41", "name": "背景41", "src": "assets/export-bgs/bg41.jpg"}, {"id": "bg42", "name": "背景42", "src": "assets/export-bgs/bg42.jpg"}, {"id": "bg43", "name": "背景43", "src": "assets/export-bgs/bg43.jpg"}, {"id": "bg44", "name": "背景44", "src": "assets/export-bgs/bg44.jpg"}, {"id": "bg45", "name": "背景45", "src": "assets/export-bgs/bg45.jpg"}];
+const EXPORT_BGS = [{"id": "bg1", "name": "背景1", "src": "assets/export-bgs/bg1.jpg"}, {"id": "bg2", "name": "背景2", "src": "assets/export-bgs/bg2.jpg"}, {"id": "bg3", "name": "背景3", "src": "assets/export-bgs/bg3.jpg"}, {"id": "bg4", "name": "背景4", "src": "assets/export-bgs/bg4.jpg"}, {"id": "bg5", "name": "背景5", "src": "assets/export-bgs/bg5.jpg"}, {"id": "bg6", "name": "背景6", "src": "assets/export-bgs/bg6.jpg"}, {"id": "bg7", "name": "背景7", "src": "assets/export-bgs/bg7.jpg"}, {"id": "bg8", "name": "背景8", "src": "assets/export-bgs/bg8.jpg"}, {"id": "bg9", "name": "背景9", "src": "assets/export-bgs/bg9.jpg"}, {"id": "bg10", "name": "背景10", "src": "assets/export-bgs/bg10.jpg"}, {"id": "bg11", "name": "背景11", "src": "assets/export-bgs/bg11.jpg"}, {"id": "bg12", "name": "背景12", "src": "assets/export-bgs/bg12.jpg"}, {"id": "bg13", "name": "背景13", "src": "assets/export-bgs/bg13.jpg"}, {"id": "bg14", "name": "背景14", "src": "assets/export-bgs/bg14.jpg"}, {"id": "bg15", "name": "背景15", "src": "assets/export-bgs/bg15.jpg"}, {"id": "bg16", "name": "背景16", "src": "assets/export-bgs/bg16.jpg"}, {"id": "bg17", "name": "背景17", "src": "assets/export-bgs/bg17.jpg"}, {"id": "bg18", "name": "背景18", "src": "assets/export-bgs/bg18.jpg"}, {"id": "bg19", "name": "背景19", "src": "assets/export-bgs/bg19.jpg"}, {"id": "bg20", "name": "背景20", "src": "assets/export-bgs/bg20.jpg"}, {"id": "bg21", "name": "背景21", "src": "assets/export-bgs/bg21.jpg"}, {"id": "bg22", "name": "背景22", "src": "assets/export-bgs/bg22.jpg"}, {"id": "bg23", "name": "背景23", "src": "assets/export-bgs/bg23.jpg"}, {"id": "bg24", "name": "背景24", "src": "assets/export-bgs/bg24.jpg"}, {"id": "bg25", "name": "背景25", "src": "assets/export-bgs/bg25.jpg"}, {"id": "bg26", "name": "背景26", "src": "assets/export-bgs/bg26.jpg"}, {"id": "bg27", "name": "背景27", "src": "assets/export-bgs/bg27.jpg"}, {"id": "bg28", "name": "背景28", "src": "assets/export-bgs/bg28.jpg"}, {"id": "bg29", "name": "背景29", "src": "assets/export-bgs/bg29.jpg"}, {"id": "bg30", "name": "背景30", "src": "assets/export-bgs/bg30.jpg"}, {"id": "bg31", "name": "背景31", "src": "assets/export-bgs/bg31.jpg"}, {"id": "bg32", "name": "背景32", "src": "assets/export-bgs/bg32.jpg"}, {"id": "bg33", "name": "背景33", "src": "assets/export-bgs/bg33.jpg"}, {"id": "bg34", "name": "背景34", "src": "assets/export-bgs/bg34.jpg"}, {"id": "bg35", "name": "背景35", "src": "assets/export-bgs/bg35.jpg"}, {"id": "bg36", "name": "背景36", "src": "assets/export-bgs/bg36.jpg"}, {"id": "bg37", "name": "背景37", "src": "assets/export-bgs/bg37.jpg"}, {"id": "bg38", "name": "背景38", "src": "assets/export-bgs/bg38.jpg"}, {"id": "bg39", "name": "背景39", "src": "assets/export-bgs/bg39.jpg"}, {"id": "bg40", "name": "背景40", "src": "assets/export-bgs/bg40.jpg"}, {"id": "bg41", "name": "背景41", "src": "assets/export-bgs/bg41.jpg"}, {"id": "bg42", "name": "背景42", "src": "assets/export-bgs/bg42.jpg"}, {"id": "bg43", "name": "背景43", "src": "assets/export-bgs/bg43.jpg"}, {"id": "bg44", "name": "背景44", "src": "assets/export-bgs/bg44.jpg"}, {"id": "bg45", "name": "背景45", "src": "assets/export-bgs/bg45.jpg"}, {"id": "bg46", "name": "背景46", "src": "assets/export-bgs/bg46.jpg"}, {"id": "bg47", "name": "背景47", "src": "assets/export-bgs/bg47.jpg"}, {"id": "bg48", "name": "背景48", "src": "assets/export-bgs/bg48.jpg"}, {"id": "bg49", "name": "背景49", "src": "assets/export-bgs/bg49.jpg"}, {"id": "bg50", "name": "背景50", "src": "assets/export-bgs/bg50.jpg"}, {"id": "bg51", "name": "背景51", "src": "assets/export-bgs/bg51.jpg"}, {"id": "bg52", "name": "背景52", "src": "assets/export-bgs/bg52.jpg"}, {"id": "bg53", "name": "背景53", "src": "assets/export-bgs/bg53.jpg"}, {"id": "bg54", "name": "背景54", "src": "assets/export-bgs/bg54.jpg"}, {"id": "bg55", "name": "背景55", "src": "assets/export-bgs/bg55.jpg"}];
 let selectedExportBg = null;
 (function(){
   const row = document.getElementById('bgPickerRow');
@@ -1090,21 +1121,25 @@ let selectedExportBg = null;
   EXPORT_BGS.forEach((b,i)=>{
     const im = document.createElement('img');
     im.className = 'bg-opt' + (i===0?' on':'');
-    im.loading = 'lazy'; im.decoding = 'async';
-    im.src = b.src; im.alt = b.name; im.title = b.name;
+    im.decoding = 'async';
+    im.src = 'assets/export-bgs/thumbs/' + b.id + '.jpg';
+    im.alt = b.name; im.title = b.name;
     im.addEventListener('click', ()=>{
       row.querySelectorAll('.bg-opt').forEach(x=>x.classList.remove('on'));
       im.classList.add('on');
       selectedExportBg = b.src;
+      setTimeout(()=>preloadBg(b),0);
     });
     row.appendChild(im);
   });
   selectedExportBg = EXPORT_BGS[0] ? EXPORT_BGS[0].src : null;
+  if(EXPORT_BGS[0]) setTimeout(()=>preloadBg(EXPORT_BGS[0]),0);
 })();
 </script>
 
 <!-- export canvas -->
 <div id="export">
+  <div class="ex-maker" id="exMaker" style="display:none"></div>
   <div class="ex-title">我的游戏账号 · 新世界狂欢</div>
   <div class="ex-sub">NU:Carnival 限定卡面 · 资源 · 加分项 全览</div>
   <div class="ex-chips">
@@ -1161,7 +1196,7 @@ const RES = [
   ["r_lanzuan","蓝钻"],["r_fenzuan","粉钻"],["r_caisui","彩碎"],["r_juanzhou","卷轴"],
   ["r_epoint","e点"],["r_bigmonth","大月卡天数"],["r_smallmonth","小月卡天数"]
 ];
-const ATTR_OPTS = ["八齐","团齐","奥齐","昆齐","狐齐","狼齐","布齐","啖齐","敛齐","伊得齐","其他"];
+const ATTR_OPTS = ["八齐","团齐","奥齐","昆齐","狐齐","狼齐","布齐","啖齐","敛齐","伊得齐"];
 const GLOBAL_ADDONS = [];
 const GBG_YEARS=[2025,2026];
 let gbgSelYr=2025;
@@ -1216,7 +1251,9 @@ if(state.collab06.name==="墨菲 / 艾斯特·联动") state.collab06.name="苍�
 if(typeof state.collab06.stars!=="number") state.collab06.stars=0;
 if(Array.isArray(state.collab)) state.collab=state.collab.filter(c=>c && c.name!=="墨菲 / 艾斯特·联动");
 if(!Array.isArray(state.accountAttrs)) state.accountAttrs=[];
+state.accountAttrs = state.accountAttrs.filter(x=>x!=="其他");
 if(typeof state.accountAttrNote!=="string") state.accountAttrNote="";
+if(typeof state.makerName!=="string") state.makerName="";
 function save(){ localStorage.setItem("nuc-account-v2", JSON.stringify(state)); }
 
 /* ===== 卡面交互（静态图） ===== */
@@ -1484,7 +1521,7 @@ function bindEmails(){
   document.getElementById("emailNote").addEventListener("input", ()=>{ state.emailNote = document.getElementById("emailNote").value; save(); });
 }
 
-/* ===== 账号属性（多选 chip + 其他备注） ===== */
+/* ===== 账号属性（多选 chip + 直接填空） ===== */
 function bindAttrs(){
   const row = document.getElementById("attrRow");
   row.innerHTML = "";
@@ -1500,11 +1537,14 @@ function bindAttrs(){
     });
     row.appendChild(el);
   });
-  const noteWrap = document.getElementById("attrNoteWrap");
-  const note = document.getElementById("attrNote");
+  let note = document.createElement("input");
+  note.type = "text";
+  note.id = "attrNote";
+  note.className = "attr-free-input";
+  note.placeholder = "其他 / 多推齐（请填这里）";
   note.value = state.accountAttrNote;
-  noteWrap.style.display = state.accountAttrs.includes("其他") ? "block" : "none";
-  note.oninput = ()=>{ state.accountAttrNote = note.value; save(); };
+  note.addEventListener("input", ()=>{ state.accountAttrNote = note.value; save(); });
+  row.appendChild(note);
 }
 
 /* ===== 生成长图 ===== */
@@ -1598,11 +1638,14 @@ function fillExport(){
   cChar.style.display = anyShow ? "block":"none";
   cCards.style.display = anyShow ? "flex":"none";
   // chips
+  const mkEl = document.getElementById("exMaker");
+  const mkName = (state.makerName||"").trim();
+  if(mkEl){ if(mkName){ mkEl.textContent = "制图人 · " + mkName; mkEl.style.display = "block"; } else { mkEl.style.display = "none"; } }
   document.getElementById("exOwned").textContent = ownedCount();
-  const attrSummary = state.accountAttrs.map(x=>{
-    if(x==="其他"){ const n=state.accountAttrNote.trim(); return "其他"+(n?" · "+n:""); }
-    return x;
-  }).join("、");
+  const attrParts = state.accountAttrs.slice();
+  const attrNoteTxt = (state.accountAttrNote||"").trim();
+  if(attrNoteTxt) attrParts.push(attrNoteTxt);
+  const attrSummary = attrParts.join("、");
   document.getElementById("exAttrChip").textContent = attrSummary || "—";
   // resources
   let r=''; RES.forEach(x=>{ const v=state.resources[x[0]]; r += `<div class="ex-item"><b>${x[1]}</b><em>${v===""||v==null?"—":v}</em></div>`; });
@@ -1659,6 +1702,19 @@ function loadScript(src){
     document.body.appendChild(sc);
   });
 }
+/* 选中背景即预加载：JPG 进缓存；file:// 下提前载入 bgN.js，避免点生成时才等待 */
+let bgPreload = null, bgPreloadNum = null;
+function preloadBg(b){
+  const pim = new Image(); pim.src = b.src;
+  if(IS_FILE){
+    const m = String(b.src).match(/bg(\d+)\.jpg(?:[?#]|$)/);
+    if(m && m[1] !== bgPreloadNum){
+      bgPreloadNum = m[1];
+      bgPreload = loadScript("assets/data/bg/bg" + m[1] + ".js");
+      bgPreload.catch(()=>{ bgPreload = null; });
+    }
+  }
+}
 function ensureHtml2Canvas(){
   return new Promise((resolve, reject) => {
     if(typeof window.html2canvas === "function") return resolve();
@@ -1693,7 +1749,8 @@ document.getElementById("genBtn").addEventListener("click", ()=>{
         CARD_IMG_DATA = window.CARD_IMG_DATA || {};
         const bm = String(selectedExportBg || "").match(/bg(\d+)\.jpg(?:[?#]|$)/);
         if(bm){
-          await loadScript("assets/data/bg/bg" + bm[1] + ".js");
+          if(bgPreload && bgPreloadNum===bm[1]) await bgPreload;
+          else await loadScript("assets/data/bg/bg" + bm[1] + ".js");
           const bgLayer = ex.querySelector(".ex-bg");
           if(bgLayer && window.__BG_DATA) bgLayer.style.backgroundImage = "url(" + window.__BG_DATA + ")";
         }
@@ -1707,7 +1764,9 @@ document.getElementById("genBtn").addEventListener("click", ()=>{
         if(!cur.startsWith("data:")) return res();
         im.onload = im.onerror = res; im.src = cur;
       })));
+      _mark("imgs-ready");
       const canvas = await html2canvas(ex, {backgroundColor:"#f6fbff", scale:2, useCORS:true, logging:false, width:900});
+      _mark("h2c-render");
       const blob = await new Promise((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error("blank")), "image/png"));
       const url = URL.createObjectURL(blob);
       const data = canvas.toDataURL("image/png");
@@ -1733,8 +1792,55 @@ document.getElementById("modalClose").addEventListener("click", ()=>{
 
 let CARD_IMG_DATA = {};
 
+/* ===== 制图人绑定 ===== */
+function bindMaker(){
+  const inp = document.getElementById("makerInput");
+  if(!inp) return;
+  inp.value = state.makerName || "";
+  inp.addEventListener("input", ()=>{ state.makerName = inp.value; save(); });
+}
+
+/* ===== 点击星光迸发（所有可点元素） ===== */
+(function(){
+  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const STAR_PATH = "M12 1 C13 8 15.5 10.5 23 12 C15.5 13.5 13 16 12 23 C11 16 8.5 13.5 1 12 C8.5 10.5 11 8 12 1 Z";
+  const COLORS = ["#7FB0E0","#BFD9F0","#D4B98C","#F2C6D4","#9B8CE0","#7FB0E0"];
+  const COUNT = 6;
+  const INTERACTIVE = "button,a,input,select,textarea,label,[role=button],[onclick],.card-cell,.fchip,.toggle,.act-chip,.star,.bg-opt,.chip,.ex-chip";
+  function isInteractive(node){
+    let n = node;
+    while(n && n !== document.documentElement){
+      if(n.matches && n.matches(INTERACTIVE)) return true;
+      if(n.matches && getComputedStyle(n).cursor === "pointer") return true;
+      n = n.parentElement;
+    }
+    return false;
+  }
+  document.addEventListener("click", function(e){
+    if(!isInteractive(e.target)) return;
+    const layer = document.createElement("div");
+    layer.className = "sparkle-layer";
+    layer.style.left = e.clientX + "px";
+    layer.style.top = e.clientY + "px";
+    for(let i=0;i<COUNT;i++){
+      const ang = (Math.PI*2*i)/COUNT + (Math.random()*0.6-0.3);
+      const dist = 20 + Math.random()*18;
+      const s = document.createElement("span");
+      s.className = "sparkle-burst";
+      s.style.setProperty("--dx", (Math.cos(ang)*dist).toFixed(1)+"px");
+      s.style.setProperty("--dy", (Math.sin(ang)*dist).toFixed(1)+"px");
+      s.style.setProperty("--rot", (Math.random()*180-90).toFixed(0)+"deg");
+      s.style.animationDuration = (0.55+Math.random()*0.25).toFixed(2)+"s";
+      s.innerHTML = '<svg viewBox="0 0 24 24"><path d="'+STAR_PATH+'" fill="'+COLORS[i%COLORS.length]+'"/></svg>';
+      layer.appendChild(s);
+    }
+    document.body.appendChild(layer);
+    setTimeout(function(){ layer.remove(); }, 1100);
+  });
+})();
+
 /* ===== 初始化 ===== */
-bindCards(); bindStars(); bindFilter(); buildCollab(); buildActs(); buildAddonPerChar(); bindResources(); bindEmails(); bindAttrs(); updateCounts(); save();
+bindCards(); bindStars(); bindFilter(); buildCollab(); buildActs(); buildAddonPerChar(); bindResources(); bindEmails(); bindAttrs(); bindMaker(); updateCounts(); save();
 </script>
 
 </body>
