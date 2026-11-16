@@ -1554,16 +1554,34 @@ function bindCards(){
   });
 }
 
-/* ===== 一键清空：把卡面收藏区全部已拥有卡重置为未拥有（不动星级与其他数据） ===== */
+/* ===== 一键清空：把所有卡面（含联动卡）重置为未拥有，并清空所有叠星（其他数据不动） ===== */
 function clearAllOwned(){
-  GROUPS.forEach((g,gi)=> g.cols.forEach(c=>{ state.owned[gi][c] = false; }));
-  document.querySelectorAll(".card-cell").forEach(cell=> cell.classList.add("off"));
+  GROUPS.forEach((g,gi)=> g.cols.forEach(c=>{
+    state.owned[gi][c] = false;
+    if(state.stars[gi]) state.stars[gi][c] = 0;
+  }));
+  document.querySelectorAll(".card-cell").forEach(cell=>{
+    cell.classList.add("off");
+    renderStar(cell);
+  });
+  /* 联动卡：苍叶（含星级）与所有占位联动卡一并清空 */
+  if(state.collab06){ state.collab06.own = false; state.collab06.stars = 0; }
+  const c6Name = document.querySelector("#collab06Name");
+  if(c6Name){
+    const c6Slot = c6Name.closest(".collab-slot");
+    if(c6Slot) c6Slot.classList.add("off");
+    document.querySelectorAll("#collab06Stars .star").forEach(s=>s.classList.remove("on"));
+  }
+  if(Array.isArray(state.collab)){
+    state.collab.forEach(c=>{ c.own = false; });
+    document.querySelectorAll("#collabGrid .toggle").forEach(t=>t.classList.remove("on"));
+  }
   updateCounts(); save();
 }
 function bindClearOwned(){
   const b = document.getElementById("clearOwnedBtn");
   if(b) b.addEventListener("click", ()=>{
-    if(confirm("确定要清空吗？将把卡面收藏区所有已选择的卡面全部变为未选择（星级评分保留）。")) clearAllOwned();
+    if(confirm("确定要清空吗？将把所有已选择的卡面（含联动卡）全部变为未选择，并清空所有叠星评分。")) clearAllOwned();
   });
 }
 
